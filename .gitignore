@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+
+# uv
+.python-version
+
+# Benchmark outputs — commit analysis, not raw results
+benchmarks/results/*.json
+benchmarks/results/*.csv
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Observability — export configs not live data
+observability/grafana/data/
+
+# Kubernetes secrets
+k8s/*-secret.yaml
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+
+# Model weights — never commit these
+*.bin
+*.safetensors
+*.gguf
+*.pt
+*.pth
+
+# Logs
+*.log
+logs/
+
+# AWS credentials
+.aws/
