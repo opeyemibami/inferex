@@ -1,0 +1,3 @@
+# Claude Code configuration for inferex
+# All rules are in AGENTS.md at the repo root.
+# This project uses a shared AGENTS.md so Claude Code and Codex stay in sync.
