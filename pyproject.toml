@@ -10,6 +10,7 @@ dependencies = [
     "huggingface-hub>=1.16.1",
     "openai>=2.38.0",
     "pydantic>=2.13.4",
+    "httpx>=0.28.1",
     "structlog>=25.5.0",
     "uvicorn>=0.48.0",
     "vllm>=0.21.0",
@@ -18,7 +19,6 @@ dependencies = [
 [dependency-groups]
 dev = [
     "black>=26.5.1",
-    "httpx>=0.28.1",
     "isort>=8.0.1",
     "pytest>=9.0.3",
 ]
