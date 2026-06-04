@@ -10,7 +10,7 @@ services:
       - "8001"
       - "--max-model-len"
       - "4096"
-      - "--enforce-eager"
+      # - "--enforce-eager"
     deploy:
       resources:
         reservations:
@@ -22,6 +22,7 @@ services:
       - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
+      - ~/.cache/vllm:/root/.cache/vllm
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
