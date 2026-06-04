@@ -1,0 +1,9 @@
+apiVersion: 1
+providers:
+  - name: inferex
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/dashboards
