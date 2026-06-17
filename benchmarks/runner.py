@@ -130,8 +130,12 @@ def stop_vllm(proc: subprocess.Popen) -> None:
 # System metrics
 # ---------------------------------------------------------------------------
 
-def get_vram_mb() -> int:
-    """Query nvidia-smi for current VRAM usage in MiB on the first GPU."""
+def get_vram_mb() -> int | None:
+    """Query nvidia-smi for current VRAM usage in MiB on the first GPU.
+    
+    Returns None if the value is a sentinel/error (e.g. during Docker GPU runs
+    where nvidia-smi may return an overflow value instead of a real reading).
+    """
     result = subprocess.run(
         [
             "nvidia-smi",
@@ -142,7 +146,13 @@ def get_vram_mb() -> int:
         text=True,
         timeout=10,
     )
-    return int(result.stdout.strip().splitlines()[0])
+    try:
+        value = int(result.stdout.strip().splitlines()[0])
+        if value > 40_000:  # RTX 5090 has 32GB; anything higher is a sentinel
+            return None
+        return value
+    except (ValueError, IndexError):
+        return None
 
 
 # ---------------------------------------------------------------------------
