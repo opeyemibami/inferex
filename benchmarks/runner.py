@@ -25,10 +25,8 @@ import structlog
 
 from benchmarks.prompts import PROMPTS
 
-# ---------------------------------------------------------------------------
-# Constants — all tuneable values live here, not inside functions
-# ---------------------------------------------------------------------------
 
+# Constants — all tuneable values live here, not inside functions
 VLLM_PORT: int = 8001
 VLLM_BASE_URL: str = f"http://localhost:{VLLM_PORT}"
 HEALTH_ENDPOINT: str = f"{VLLM_BASE_URL}/health"
@@ -66,10 +64,8 @@ VARIANTS: list[dict] = [
 logger = structlog.get_logger()
 
 
-# ---------------------------------------------------------------------------
-# vLLM process management
-# ---------------------------------------------------------------------------
 
+# vLLM process management
 def start_vllm(variant: dict) -> subprocess.Popen:
     """Start vllm serve in Docker for the given variant."""
     cmd: list[str] = [
@@ -126,10 +122,8 @@ def stop_vllm(proc: subprocess.Popen) -> None:
     logger.info("vllm_stopped")
 
 
-# ---------------------------------------------------------------------------
-# System metrics
-# ---------------------------------------------------------------------------
 
+# System metrics
 def get_vram_mb() -> int | None:
     """Query nvidia-smi for current VRAM usage in MiB on the first GPU.
     
@@ -155,10 +149,8 @@ def get_vram_mb() -> int | None:
         return None
 
 
-# ---------------------------------------------------------------------------
-# Async HTTP request logic
-# ---------------------------------------------------------------------------
 
+# Async HTTP request logic
 async def run_single(
     prompt: str,
     model_name: str,
@@ -245,10 +237,8 @@ async def _run_level(
         return await run_concurrency_level(prompts, concurrency, model_name, client)
 
 
-# ---------------------------------------------------------------------------
-# Benchmark orchestration
-# ---------------------------------------------------------------------------
 
+# Benchmark orchestration
 def benchmark_variant(variant: dict) -> None:
     """Run all concurrency levels for one variant, record VRAM, and save results to JSON."""
     log = logger.bind(variant=variant["name"])
@@ -295,10 +285,8 @@ def benchmark_variant(variant: dict) -> None:
     log.info("results_saved", path=str(output_path))
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
+# Entry point
 def main() -> None:
     """Parse --variant and run the requested benchmark variants in sequence."""
     parser = argparse.ArgumentParser(
