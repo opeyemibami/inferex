@@ -1,8 +1,8 @@
-"""Phase 4 vLLM vs SGLang benchmark runner.
+"""vLLM vs SGLang benchmark runner.
 
-Usage: uv run python benchmarks/runner_phase4.py --engine all
-       uv run python benchmarks/runner_phase4.py --engine vllm
-       uv run python benchmarks/runner_phase4.py --engine sglang
+Usage: uv run python benchmarks/runner_engine_compare.py --engine all
+       uv run python benchmarks/runner_engine_compare.py --engine vllm
+       uv run python benchmarks/runner_engine_compare.py --engine sglang
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# Allow direct execution from project root: uv run python benchmarks/runner_phase4.py
+# Allow direct execution from project root: uv run python benchmarks/runner_engine_compare.py
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import argparse
@@ -27,10 +27,8 @@ import structlog
 from benchmarks.prompts import PROMPTS
 from benchmarks.runner import get_vram_mb, run_concurrency_level, run_single  # noqa: F401
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
 
+# Constants
 MODEL: str = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 MAX_MODEL_LEN: int = 4096
 VLLM_PORT: int = 8001
@@ -44,10 +42,8 @@ RESULTS_DIR: Path = Path("benchmarks/results")
 logger = structlog.get_logger()
 
 
-# ---------------------------------------------------------------------------
-# Engine process management
-# ---------------------------------------------------------------------------
 
+# Engine process management
 def start_vllm_engine() -> subprocess.Popen:
     """Start vLLM in Docker on port 8001 and wait until healthy."""
     cmd: list[str] = [
@@ -133,10 +129,8 @@ def stop_engine(proc: subprocess.Popen) -> None:
     logger.info("engine_stopped")
 
 
-# ---------------------------------------------------------------------------
-# Async level runner
-# ---------------------------------------------------------------------------
 
+# Async level runner
 async def _run_level_at(
     prompts: list[str],
     concurrency: int,
@@ -150,21 +144,19 @@ async def _run_level_at(
         return await run_concurrency_level(prompts, concurrency, MODEL, client)
 
 
-# ---------------------------------------------------------------------------
-# Benchmark orchestration
-# ---------------------------------------------------------------------------
 
+# Benchmark orchestration
 ENGINES: list[dict] = [
     {
         "name": "vllm",
         "base_url": f"http://localhost:{VLLM_PORT}",
-        "result_file": "phase4_vllm.json",
+        "result_file": "vllm.json",
         "start_fn": start_vllm_engine,
     },
     {
         "name": "sglang",
         "base_url": f"http://localhost:{SGLANG_PORT}",
-        "result_file": "phase4_sglang.json",
+        "result_file": "sglang.json",
         "start_fn": start_sglang_engine,
     },
 ]
@@ -216,10 +208,8 @@ def benchmark_engine(engine: dict) -> None:
     log.info("results_saved", path=str(output_path))
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
+# Entry point
 def main() -> None:
     """Parse --engine and run the requested engine benchmarks in sequence."""
     parser = argparse.ArgumentParser(
