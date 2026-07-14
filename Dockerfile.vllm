@@ -1,0 +1,3 @@
+FROM vllm/vllm-openai:latest
+COPY patch_vllm.py /tmp/patch_vllm.py
+RUN python3 /tmp/patch_vllm.py

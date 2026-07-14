@@ -48,3 +48,7 @@ logs/
 
 # AWS credentials
 .aws/
+
+
+docs/local/*
+.claude/

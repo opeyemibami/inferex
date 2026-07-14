@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+  namespace: inferex
+  labels:
+    app: vllm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      runtimeClassName: nvidia
+      containers:
+        - name: vllm
+          image: inferex-vllm:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--model"
+            - "meta-llama/Meta-Llama-3.1-8B-Instruct"
+            - "--port"
+            - "8001"
+            - "--max-model-len"
+            - "4096"
+          ports:
+            - containerPort: 8001
+          env:
+            - name: HUGGING_FACE_HUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: inferex-secrets
+                  key: HUGGING_FACE_HUB_TOKEN
+            - name: VLLM_ENABLE_V1_MULTIPROCESSING
+              value: "0"
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+            requests:
+              nvidia.com/gpu: "1"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: huggingface-cache
+              mountPath: /root/.cache/huggingface
+            - name: vllm-cache
+              mountPath: /root/.cache/vllm
+            - name: shm
+              mountPath: /dev/shm
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 600
+            periodSeconds: 30
+            failureThreshold: 40
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 600
+            periodSeconds: 30
+            failureThreshold: 40
+      volumes:
+        - name: huggingface-cache
+          hostPath:
+            path: /home/dev/.cache/huggingface
+            type: DirectoryOrCreate
+        - name: vllm-cache
+          hostPath:
+            path: /home/dev/.cache/vllm
+            type: DirectoryOrCreate
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 8Gi
