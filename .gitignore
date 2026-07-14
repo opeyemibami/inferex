@@ -51,3 +51,4 @@ logs/
 
 
 docs/local/*
+.claude/
